@@ -1,9 +1,14 @@
 package com.udacity.vehicles.service;
 
+import com.udacity.vehicles.client.prices.Price;
+import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Implements the car service create, read, update or delete
@@ -14,13 +19,17 @@ import org.springframework.stereotype.Service;
 public class CarService {
 
     private final CarRepository repository;
+    private WebClient maps;
+    private WebClient pricing;
 
-    public CarService(CarRepository repository) {
+    public CarService(CarRepository repository, WebClient maps, WebClient pricing) {
         /**
          * TODO: Add the Maps and Pricing Web Clients you create
          *   in `VehiclesApiApplication` as arguments and set them here.
          */
         this.repository = repository;
+        this.maps = maps;
+        this.pricing = pricing;
     }
 
     /**
@@ -44,6 +53,10 @@ public class CarService {
          */
         Car car = new Car();
 
+        Optional<Car> result = repository.findById(id);
+        if(!result.isPresent()){
+            throw new CarNotFoundException();
+        }
         /**
          * TODO: Use the Pricing Web client you create in `VehiclesApiApplication`
          *   to get the price based on the `id` input'
@@ -51,7 +64,9 @@ public class CarService {
          * Note: The car class file uses @transient, meaning you will need to call
          *   the pricing service each time to get the price.
          */
-
+        else{
+            PriceClient price = (PriceClient) pricing.get(id);
+        }
 
         /**
          * TODO: Use the Maps Web client you create in `VehiclesApiApplication`
